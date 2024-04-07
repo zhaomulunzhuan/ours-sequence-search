@@ -81,7 +81,7 @@ public class index implements Serializable{
         int datasetnums=samplesIdxList.size();
         BitSet result=new BitSet();
         for(int global_block_idx:blockList){
-            System.out.println("查询块"+global_block_idx);
+//            System.out.println("查询块"+global_block_idx);
             Block queryBlock=index.getBlock(global_block_idx);
             if(queryBlock.getUseRowStorage()){
                 BitSet cur_result=queryBlock.queryKmer(rowIdxs);

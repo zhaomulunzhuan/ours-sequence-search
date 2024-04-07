@@ -1,9 +1,6 @@
 package com.chen;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -84,6 +81,99 @@ public class Query {
         return results;
     }
 
+    public static void queryFile(String filePath){
+        String rootDirectory = ConfigReader.getProperty("project-root-directory");
+        String queryresultFile = rootDirectory+"/"+"query_result.txt";
+        try(
+                BufferedReader reader=new BufferedReader(new FileReader(filePath));
+                BufferedWriter writer=new BufferedWriter(new FileWriter(queryresultFile))){
+            String line;
+            String sequence="";
+            while ((line=reader.readLine())!=null){
+                if(line.startsWith(">")){
+                    //查询
+                    if (!sequence.isEmpty()){
+                        writer.write(sequence+"\n");
+                        ExactquerySequence(sequence,writer);
+                        writer.write(line+"\n");
+                    }else {
+                        writer.write(line+"\n");
+                    }
+                    sequence="";
+                }else {
+                    sequence+=line.trim().toUpperCase();
+                }
+            }
+            if(!sequence.isEmpty()){
+                writer.write(sequence + "\n");
+                //查询最后一段序列
+                ExactquerySequence(sequence,writer);
+            }
+        }catch (IOException e){
+            System.err.println(e);
+        }
+    }
+
+    public static void ExactquerySequence(String sequence, BufferedWriter writer) throws IOException {
+        int kmersize= Integer.parseInt(ConfigReader.getProperty("kmer-size"));
+        List<String> kmerList=new ArrayList<>();
+        // 切割sequence并将长度为kmersize的子字符串加入kmerList
+        for (int i = 0; i <= sequence.length() - kmersize; i++) {
+            String kmer = sequence.substring(i, i + kmersize);
+            kmerList.add(kmer);
+        }
+//        for (String kmer : kmerList) {
+//            System.out.println(kmer);
+//        }
+        List<String> result=new ArrayList<>(querykmer2(kmerList.get(0)));
+        for(String kmer:kmerList){
+            result.retainAll(querykmer2(kmer));
+        }
+//        System.out.println("包含输入文件中查询序列的数据集");
+//        for (String datasetName:result){
+//            System.out.println(datasetName);
+//        }
+        writer.write("查询结果\n");
+        // 将查询结果写入到结果文件
+        for (String datasetName : result) {
+            writer.write(datasetName + "\n");
+        }
+    }
+
+    public static void Exactquerykmers2(String filePath){
+        int kmersize= Integer.parseInt(ConfigReader.getProperty("kmer-size"));
+        String sequence = ""; // 初始化sequence变量
+        try (BufferedReader reader=new BufferedReader(new FileReader(filePath))){
+            String line;
+            while ((line=reader.readLine())!=null){
+                sequence+=line;
+            }
+        } catch (IOException e){
+            System.err.println(e);
+        }
+        List<String> kmerList=new ArrayList<>();
+        // 切割sequence并将长度为kmersize的子字符串加入kmerList
+        for (int i = 0; i <= sequence.length() - kmersize; i++) {
+            String kmer = sequence.substring(i, i + kmersize);
+            kmerList.add(kmer);
+        }
+//        for (String kmer : kmerList) {
+//            System.out.println(kmer);
+//        }
+        List<String> result=new ArrayList<>(querykmer2(kmerList.get(0)));
+        for(String kmer:kmerList){
+            result.retainAll(querykmer2(kmer));
+        }
+//        System.out.println("包含输入文件中查询序列的数据集");
+//        if (result.size()==0){
+//            System.out.println("未查询到包含查询序列的数据集");
+//        }else {
+//            for (String datasetName:result){
+//                System.out.println(datasetName);
+//            }
+//        }
+    }
+
     public static List<String> querykmer2(String kmer){
         List<String> results=new ArrayList<>();
 
@@ -101,14 +191,14 @@ public class Query {
             List<String> cur_datasetResult = index.searchBlocks2(blockList, datasetIdxs, rowIdxs);
             results.addAll(cur_datasetResult);
         }
-        System.out.println(kmer+"查询到数据集：");
-        if (results.size()==0){
-            System.out.println("未查询到包含查询元素的数据集");
-        }else {
-            for(String dataset:results){
-                System.out.println(dataset);
-            }
-        }
+//        System.out.println(kmer+"查询到数据集：");
+//        if (results.size()==0){
+//            System.out.println("未查询到包含查询元素的数据集");
+//        }else {
+//            for(String dataset:results){
+//                System.out.println(dataset);
+//            }
+//        }
         return results;
     }
 

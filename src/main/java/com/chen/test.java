@@ -10,51 +10,22 @@ public class test {
 //        DataPreProcessing.dataPreprocessing();
 //        Build.buildIndex();
         //不是初次构建，从序列化文件中加载
+        long startBuild=System.currentTimeMillis();
+
         Build.buildIndexFromSER();
-        MetaData.outputMetadata();
 
-        index.printIndex();
+        long endBuild=System.currentTimeMillis();
+        long BuildTime=endBuild-startBuild;
+        System.out.println("构建时间"+BuildTime+"毫秒");
 
-//        Delete.deleteDataset("GCF_000005845.2_ASM584v2_genomic.fna");
+        long startQuery=System.currentTimeMillis();
 
-//        Insert.insertDatasets("Insert_3.txt");
+//        Query.Exactquerykmers2("D:\\SequenceSearch_2\\query.txt");
+        Query.queryFile("D:\\SequenceSearch_2\\query.txt");
 
-//        MetaData.outputMetadata();
-//        index.printIndex();
-//        System.out.println(index.getBlock(0).queryExistence("CTGAGGATACTCTTCTAAAGACATTCTTGTA"));
-//
-//        System.out.println(index.getBlock(11).getNumsBloomFilter());
-//
-//        MetaData.outputMetadata();
-//
-//        index.printIndex();
-//        Block block=index.getBlock(11);
-//        List<BloomFilter> bflist=block.getBloomFilterList();
-//        System.out.println(bflist);
-//        System.out.println(block.getRowStorageBlock().size());
-//        block.convertToColumnStorage();
-//        System.out.println(block.getBloomFilterList().get(0).getBitarray().size()*block.getNumsBloomFilter());
-//        MetaData.outputMetadata();
-//        index.printIndex();
-//
-        long startTime = System.currentTimeMillis();
-
-        Query.querykmer2("TTATTACACCTCCCTGAGGATACTCTTCTAA");
-
-        long endTime = System.currentTimeMillis();
-        // 计算代码的运行时间
-        long elapsedTime = endTime - startTime;
-        System.out.println("代码运行时间：" + elapsedTime + " 毫秒");
-
-
-        long startTime2 = System.currentTimeMillis();
-
-        Query.querykmer("TTATTACACCTCCCTGAGGATACTCTTCTAA");
-
-        long endTime2 = System.currentTimeMillis();
-        // 计算代码的运行时间
-        long elapsedTime2 = endTime2 - startTime2;
-        System.out.println("代码运行时间：" + elapsedTime2 + " 毫秒");
+        long endQuery=System.currentTimeMillis();
+        long QueryTime=endQuery-startQuery;
+        System.out.println("查询时间"+QueryTime+"毫秒");
 
 
     }
