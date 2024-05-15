@@ -40,7 +40,7 @@ public class index implements Serializable{
         blocks.set(index, null);
     }
 
-    public static List<String> searchBlocks(List<Integer> blockList, List<Integer> samplesIdxList, String querykmer){
+    public static List<String> searchBlocksAScol(List<Integer> blockList, List<Integer> samplesIdxList, String querykmer){
         List<String> resultDataset=new ArrayList<>();
         int datasetnums=samplesIdxList.size();
         ArrayList<Boolean> result = new ArrayList<>();
@@ -51,7 +51,7 @@ public class index implements Serializable{
                 System.out.println(global_block_idx+"查询的时候进行了从行存储到列存储的转换");
                 queryBlock.convertToColumnStorage();
             }
-            ArrayList<Boolean> cur_result=queryBlock.queryExistence(querykmer);
+            ArrayList<Boolean> cur_result=queryBlock.queryExistenceAScol(querykmer);
 //            System.out.println("拼接结果");
             result.addAll(cur_result);
 //            System.out.println(result);
@@ -76,7 +76,7 @@ public class index implements Serializable{
         return resultDataset;
     }
 
-    public static List<String> searchBlocks2(List<Integer> blockList, List<Integer> samplesIdxList, List<Long> rowIdxs){
+    public static List<String> searchBlocksAsRow(List<Integer> blockList, List<Integer> samplesIdxList, List<Long> rowIdxs){
         List<String> resultDataset=new ArrayList<>();
         int datasetnums=samplesIdxList.size();
         BitSet result=new BitSet();

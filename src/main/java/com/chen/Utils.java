@@ -31,7 +31,9 @@ public class Utils {
                 if(parts.length==2){//每行有两个元素
                     int index=Integer.parseInt(parts[0]);//解析数据集索引
                     long cardinality=Long.parseLong(parts[1]);//解析基数
+                    //b是最小基数，最开始只是简单将基数是b的倍数作为组数
                     int group_nums= (int) (cardinality/b)+1;
+
                     BufferedWriter writer=writerMap.computeIfAbsent(group_nums,k->{
                         try {
                             return new BufferedWriter(new FileWriter(segementedDirectory+"/"+"segement_"+k+".txt"));

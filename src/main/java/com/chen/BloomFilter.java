@@ -21,9 +21,6 @@ public class BloomFilter implements Serializable {
         this.bitarray = new BitSet(size);
     }
 
-    public BitSet getbitarray(){
-        return bitarray;
-    }
 
     public void insertElement(String element) {
         List<Long> hashValues = Utils.myHash(element, k, size);
@@ -44,7 +41,7 @@ public class BloomFilter implements Serializable {
         }
     }
 
-    public boolean test(String element) {
+    public boolean test(String element) {//按列即按布隆过滤器查询时才需要
         List<Long> hashValues = new ArrayList<>();
         hashValues = Utils.myHash(element, k, size);
         for (long index : hashValues) {

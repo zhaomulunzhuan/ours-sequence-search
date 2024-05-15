@@ -8,11 +8,11 @@ public class DataPreProcessing {
 
     public static void dataPreprocessing() {
         long startTime=System.nanoTime();//起始时间
-        //提取输入数据集文件 每行是一个数据集文件路径的 文件，存入配置文件中 InputFilePath.txt
+        //提取输入数据集文件路径 每行是一个数据集文件路径，存入配置文件中 InputFilePath.txt
         GetFilePathFromFile.generatePathFile();
         //kmer大小
         int kmer_size= Integer.parseInt(ConfigReader.getProperty("kmer-size"));
-        //存储 数据集文件路径的文件
+        //存储 数据集文件路径 的文件
         String inputFilePaths=ConfigReader.getProperty("InputFilePath");
         //修改元数据 numSamples idx_to_name name_to_idx
         int datasetIndex=0;//数据集索引
@@ -34,13 +34,13 @@ public class DataPreProcessing {
         HyperLogLogEstimator.estimateKmerCardinalities(kmerdatasetsPath);
 
         //根据配置文件中给定的预期误报率FPR和哈希函数个数k，选择基础布隆过滤器能存储的元素基数b，确定基础布隆过滤器大小m
-        long b=745000;//假设 后面用函数确定
+//        long b=650000;//假设 后面用函数确定
+        long b= Long.parseLong(ConfigReader.getProperty("bf-cardinality"));
         double FPR= Double.parseDouble(ConfigReader.getProperty("FPR"));
         int k= Integer.parseInt(ConfigReader.getProperty("k"));
         long m= (long) (-1 * (k * b) / Math.log(1 - Math.pow(FPR, 1.0 / k)));
         ConfigReader.addProperty("BF-size", String.valueOf(m));
-        ConfigReader.addProperty("bf-cardinality", String.valueOf(b));
-
+        //分段
         Utils.divideSegment(b);
 
         long endTime=System.nanoTime();//结束时间

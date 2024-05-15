@@ -25,6 +25,7 @@ public class HyperLogLogEstimator {//基数估计
 
         String rootDirectory = ConfigReader.getProperty("project-root-directory");
         String cardinalityFile = rootDirectory+"/"+"dataidx_to_cardinality.txt";
+        long minCardinality = Long.MAX_VALUE; // 初始化为最大可能的长整型值
         try(BufferedWriter writer=new BufferedWriter((new FileWriter(cardinalityFile)))){
             for (File file : files) {
                 if (file.isFile()) {
@@ -37,11 +38,18 @@ public class HyperLogLogEstimator {//基数估计
                     writer.write(line);
                     writer.newLine();
 //                System.out.println("File: " + file.getName() + ", Exact Kmer Cardinality: " + calculateExactKmerCardinality(file));
+                    // 更新最小基数
+                    if (cardinality < minCardinality) {
+                        minCardinality = cardinality;
+                    }
                 }
             }
         }catch (IOException e){
             System.err.println("写入数据集基数信息时出错"+e.getMessage());
         }
+        //将基础布隆过滤器的基数设置为比最小基数大的1000的倍数
+        long b=((minCardinality+9999)/10000)*10000;
+        ConfigReader.addProperty("bf-cardinality", String.valueOf(b));
         ConfigReader.addProperty("cardinalitiesFile","dataidx_to_cardinality.txt");//将存储基数信息的文件名记录到配置信息中
     }
 
@@ -78,7 +86,7 @@ public class HyperLogLogEstimator {//基数估计
     }
 }
 
-//import java.io.*;
+
 //import java.util.concurrent.Callable;
 //import java.util.concurrent.ExecutorService;
 //import java.util.concurrent.Executors;

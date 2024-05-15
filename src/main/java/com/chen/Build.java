@@ -67,7 +67,7 @@ public class Build {
         long buildend=System.nanoTime();
         long buildelapsedTime=buildend-buildstart;
         double elapsedTimeInseconds=(double) buildelapsedTime/1_000_000_000.0;
-        for(Block block:index.getBlockList()){
+        for(Block block:index.getBlockList()){//将block转换为按行存储
             block.serialize();
         }
         System.out.println("build时间"+elapsedTimeInseconds+"秒");
@@ -85,10 +85,10 @@ public class Build {
     }
 
     public static void buildIndexFromSER(){
-        String MetaDataFile=ConfigReader.getProperty("project-root-directory")+"/"+"metadata.ser";
+        String MetaDataFile=ConfigReader.getProperty("project-root-directory")+"/"+"serializeFile/metadata.ser";
         MetaData.deserialize(MetaDataFile);
 //        MetaData.outputMetadata();
-        String indexFile=ConfigReader.getProperty("project-root-directory")+"/"+"index.ser";
+        String indexFile=ConfigReader.getProperty("project-root-directory")+"/"+"serializeFile/index.ser";
         index.deserialize(indexFile);
 //        index.printIndex();
         // 构造配置文件目标文件路径
@@ -120,13 +120,15 @@ public class Build {
 
     public static void serializeAll() throws IOException {
         //元数据序列化
-        String MetaDataFile=ConfigReader.getProperty("project-root-directory")+"/"+"metadata.ser";
+        String MetaDataFile=ConfigReader.getProperty("project-root-directory")+"/"+"serializeFile/metadata.ser";
         MetaData.serialize(MetaDataFile);
         //索引序列化，即将块信息和布隆过滤器信息序列化
-        String indexFile=ConfigReader.getProperty("project-root-directory")+"/"+"index.ser";
+        String indexFile=ConfigReader.getProperty("project-root-directory")+"/"+"serializeFile/index.ser";
         index.serialize(indexFile);
         //将配置文件存储项目目录下
         ConfigReader.saveConfigFile();
     }
+
+
 
 }
