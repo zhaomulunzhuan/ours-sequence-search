@@ -20,6 +20,7 @@ public class Build {
         long buildstart=System.nanoTime();
         String segementedDirectory=ConfigReader.getProperty("project-root-directory")+"/"+ConfigReader.getProperty("segementedDirectory");
 
+        int count=0;
         //遍历目录下的所有文件
         File folder=new File(segementedDirectory);
         File[] files=folder.listFiles();
@@ -47,6 +48,8 @@ public class Build {
                         }
                         for(int j=0;j<chunk.size();j++){
                             String samplePath=chunk.get(j);//获得当前要处理的数据集的文件路径
+                            count++;
+                            System.out.println("当前处理数据集数量："+count);
                             try (BufferedReader reader=new BufferedReader(new FileReader(samplePath))){
                                 String kmer;
                                 while ((kmer=reader.readLine())!=null){

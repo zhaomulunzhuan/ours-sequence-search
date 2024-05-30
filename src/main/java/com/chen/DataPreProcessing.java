@@ -6,7 +6,7 @@ import java.io.IOException;
 
 public class DataPreProcessing {
 
-    public static void dataPreprocessing() {
+    public static void dataPreprocessing() throws IOException {
         long startTime=System.nanoTime();//起始时间
         //提取输入数据集文件路径 每行是一个数据集文件路径，存入配置文件中 InputFilePath.txt
         GetFilePathFromFile.generatePathFile();
@@ -48,6 +48,7 @@ public class DataPreProcessing {
         double elapsedTimeInsecondes=(double) elapsedTime/1000_000_000.0;
         System.out.println("数据预处理程序运行时间"+elapsedTimeInsecondes+"秒");
 //        MetaData.outputMetadata();
+
     }
 
 }

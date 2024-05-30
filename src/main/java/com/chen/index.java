@@ -45,13 +45,17 @@ public class index implements Serializable{
         int datasetnums=samplesIdxList.size();
         ArrayList<Boolean> result = new ArrayList<>();
         for(int global_block_idx:blockList){
-            System.out.println("查询块"+global_block_idx);
+//            System.out.println("查询块"+global_block_idx);
             Block queryBlock=index.getBlock(global_block_idx);
             if(queryBlock.getUseRowStorage()){
-                System.out.println(global_block_idx+"查询的时候进行了从行存储到列存储的转换");
+//                System.out.println(global_block_idx+"查询的时候进行了从行存储到列存储的转换");
                 queryBlock.convertToColumnStorage();
             }
             ArrayList<Boolean> cur_result=queryBlock.queryExistenceAScol(querykmer);
+            if (global_block_idx==135){
+                System.out.println("按列135块");
+                System.out.println(cur_result);
+            }
 //            System.out.println("拼接结果");
             result.addAll(cur_result);
 //            System.out.println(result);
@@ -80,16 +84,17 @@ public class index implements Serializable{
         List<String> resultDataset=new ArrayList<>();
         int datasetnums=samplesIdxList.size();
         BitSet result=new BitSet();
+        int pos=0;
         for(int global_block_idx:blockList){
 //            System.out.println("查询块"+global_block_idx);
             Block queryBlock=index.getBlock(global_block_idx);
             if(queryBlock.getUseRowStorage()){
                 BitSet cur_result=queryBlock.queryKmer(rowIdxs);
-                int result_length=result.length();
-                int cur_result_length=cur_result.length();
+                int cur_result_length=queryBlock.getNumsBloomFilter();
                 for (int i=0;i<cur_result_length;i++){
-                    result.set(result_length+i,cur_result.get(i));
+                    result.set(pos+i,cur_result.get(i));
                 }
+                pos+=cur_result_length;
             }else {
                 System.err.println("当前块是按列存储，不支持按行存储查询方法");
             }

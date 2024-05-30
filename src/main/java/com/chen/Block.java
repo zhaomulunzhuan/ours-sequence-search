@@ -75,6 +75,7 @@ public class Block implements Serializable {
             }
 //            bf.printBitSet();
         }
+//        System.out.println("按列查询结果"+result);
         return result;
     }
 
@@ -83,14 +84,20 @@ public class Block implements Serializable {
         result.set(0, numsBloomFilter);//所有位设置为true
         for(long rowIndex:rowIdxs){
             int startIndex= (int) (rowIndex*numsBloomFilter);
+
             int endIndex=startIndex+numsBloomFilter;
             endIndex = Math.min(endIndex, rowStorageBlock.length());
 
-            BitSet rangeBits = rowStorageBlock.get(startIndex, endIndex);
+            BitSet rangeBits = rowStorageBlock.get(startIndex, endIndex);//不包括endIndex
 
             result.and(rangeBits);
 
         }
+//        System.out.println("按行查询结果");
+//        for(int i=0;i<numsBloomFilter;i++){
+//            System.out.print(result.get(i)+",");
+//        }
+//        System.out.println();
         return result;
     }
 
