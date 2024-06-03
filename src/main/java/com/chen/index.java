@@ -80,7 +80,7 @@ public class index implements Serializable{
         return resultDataset;
     }
 
-    public static List<String> searchBlocksAsRow(List<Integer> blockList, List<Integer> samplesIdxList, List<Long> rowIdxs){
+    public static List<String> searchBlocksAsRow_bitset_row(List<Integer> blockList, List<Integer> samplesIdxList, List<Long> rowIdxs){
         List<String> resultDataset=new ArrayList<>();
         int datasetnums=samplesIdxList.size();
         BitSet result=new BitSet();
@@ -89,7 +89,38 @@ public class index implements Serializable{
 //            System.out.println("查询块"+global_block_idx);
             Block queryBlock=index.getBlock(global_block_idx);
             if(queryBlock.getUseRowStorage()){
-                BitSet cur_result=queryBlock.queryKmer(rowIdxs);
+                BitSet cur_result=queryBlock.queryKmer_bitset_row(rowIdxs);
+                int cur_result_length=queryBlock.getNumsBloomFilter();
+                for (int i=0;i<cur_result_length;i++){
+                    result.set(pos+i,cur_result.get(i));
+                }
+                pos+=cur_result_length;
+            }else {
+                System.err.println("当前块是按列存储，不支持按行存储查询方法");
+            }
+
+        }
+        for (int i = 0; i < datasetnums; i++) {
+            boolean bit = result.get(i); // 获取第i位的值
+            if(bit){
+                String fileName = MetaData.getNameByIdx(samplesIdxList.get(i));
+                resultDataset.add(fileName);
+            }
+        }
+        return resultDataset;
+    }
+
+
+    public static List<String> searchBlocksAsRow_longArray_row(List<Integer> blockList, List<Integer> samplesIdxList, List<Long> rowIdxs){
+        List<String> resultDataset=new ArrayList<>();
+        int datasetnums=samplesIdxList.size();
+        BitSet result=new BitSet();
+        int pos=0;
+        for(int global_block_idx:blockList){
+//            System.out.println("查询块"+global_block_idx);
+            Block queryBlock=index.getBlock(global_block_idx);
+            if(queryBlock.getUseRowStorage()){
+                BitSet cur_result=queryBlock.queryKmer_longArray_row(rowIdxs);
                 int cur_result_length=queryBlock.getNumsBloomFilter();
                 for (int i=0;i<cur_result_length;i++){
                     result.set(pos+i,cur_result.get(i));

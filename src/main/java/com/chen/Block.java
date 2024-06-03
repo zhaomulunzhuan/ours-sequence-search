@@ -17,7 +17,13 @@ public class Block implements Serializable {
     private boolean  useRowStorage;//按行还是按列，这里的按列是指逻辑布隆过滤器存储连续，用于构建，添加，删除，按行是每个布隆过滤器的同一bit连续，用于查询
     private boolean serializeAsRow; // 指示序列化方式
 
-    public Block(int BlockIndex,int numsBloomFilter){
+    private static long bitset_convert_longarray=0;
+
+    public static long getBitset_convert_longarray() {
+        return bitset_convert_longarray;
+    }
+
+    public Block(int BlockIndex, int numsBloomFilter){
         this.BlockIndex=BlockIndex;
         this.numsBloomFilter=numsBloomFilter;
         this.max_numBloomFilter = Integer.parseInt(ConfigReader.getProperty("Block-max-size"));
@@ -79,7 +85,7 @@ public class Block implements Serializable {
         return result;
     }
 
-    public BitSet queryKmer(List<Long> rowIdxs){//按行查询
+    public BitSet queryKmer_bitset_row(List<Long> rowIdxs){//按行查询 使用bitset
         BitSet result = new BitSet(numsBloomFilter);
         result.set(0, numsBloomFilter);//所有位设置为true
         for(long rowIndex:rowIdxs){
@@ -90,14 +96,63 @@ public class Block implements Serializable {
 
             BitSet rangeBits = rowStorageBlock.get(startIndex, endIndex);//不包括endIndex
 
-            result.and(rangeBits);
 
+            result.and(rangeBits);
         }
+
 //        System.out.println("按行查询结果");
 //        for(int i=0;i<numsBloomFilter;i++){
 //            System.out.print(result.get(i)+",");
 //        }
 //        System.out.println();
+
+        return result;
+    }
+
+
+    public BitSet queryKmer_longArray_row(List<Long> rowIdxs){//按行查询 将longbitset转换为long数组
+        long start_convert=System.currentTimeMillis();
+        //转换为long数组
+        long[] longarray=rowStorageBlock.toLongArray();
+        long end_convert=System.currentTimeMillis();
+        bitset_convert_longarray+=(end_convert-start_convert);
+
+        BitSet result = new BitSet(numsBloomFilter);
+        result.set(0, numsBloomFilter);//所有位设置为true
+        BitSet tempbitset=new BitSet(numsBloomFilter);
+
+
+        for(long index:rowIdxs){
+            long start_index= (long) index *numsBloomFilter;//哈希到的这一行的一个元素的bit索引
+            long end_index=start_index+numsBloomFilter-1;
+
+            long start_long_index=start_index/Long.SIZE;//开始要取的第一个bit所在的long索引
+            long start_bit_index=start_index%Long.SIZE;
+
+            long end_long_index=end_index/Long.SIZE;//要取的最后一个bit所在的long索引
+            long end_bit_index=end_index%Long.SIZE;
+
+            for (long i = start_long_index; i <= end_long_index; i++) {
+                long start_bit = (i == start_long_index) ? start_bit_index : 0;
+                long end_bit = (i == end_long_index) ? end_bit_index : Long.SIZE - 1;
+
+                long mask;
+                if (end_bit==63){
+                    mask = 0xFFFFFFFFFFFFFFFFL-((1L << start_bit) - 1L);
+                }else{
+                    mask = (1L << (end_bit + 1)) - (1L << start_bit);
+                }
+                long value = longarray[(int) i] & mask;
+                for (long j = start_bit; j <= end_bit; j++) {
+                    if ((value & (1L << j)) != 0) {
+                        tempbitset.set((int) ((i - start_long_index) * Long.SIZE + j - start_bit_index));
+                    }
+                }
+            }
+            result.and(tempbitset);
+            tempbitset.clear();
+
+        }
         return result;
     }
 

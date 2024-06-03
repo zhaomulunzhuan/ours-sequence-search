@@ -16,7 +16,7 @@ public class Delete {
 
         MetaData.outputMetadata();
 
-        Query.queryFile("D:\\SequenceSearch_2\\query.txt");
+        Query.queryFile_bitset_row("D:\\SequenceSearch_2\\query.txt");
     }
 
     public static void deleteDatasets(String deleteFile){//deleteFile每行是要删除的数据集名
