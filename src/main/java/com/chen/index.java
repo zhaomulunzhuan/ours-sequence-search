@@ -10,6 +10,13 @@ public class index implements Serializable{
     private static final long serialVersionUID = 1L;
     private static List<Block> blocks;
 
+
+    private static long longarray_querytime=0;
+
+    public static long getLongarray_querytime() {
+        return longarray_querytime;
+    }
+
     //构造函数
     static {
         blocks=new ArrayList<>();
@@ -121,6 +128,7 @@ public class index implements Serializable{
             Block queryBlock=index.getBlock(global_block_idx);
             if(queryBlock.getUseRowStorage()){
                 BitSet cur_result=queryBlock.queryKmer_longArray_row(rowIdxs);
+                longarray_querytime += queryBlock.getLongarray_qurey_time();
                 int cur_result_length=queryBlock.getNumsBloomFilter();
                 for (int i=0;i<cur_result_length;i++){
                     result.set(pos+i,cur_result.get(i));

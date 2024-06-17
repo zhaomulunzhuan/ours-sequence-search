@@ -49,12 +49,12 @@ public class Build {
                         for(int j=0;j<chunk.size();j++){
                             String samplePath=chunk.get(j);//获得当前要处理的数据集的文件路径
                             count++;
-                            System.out.println("当前处理数据集数量："+count);
+//                            System.out.println("当前处理数据集数量："+count+",数据集文件:"+samplePath);
                             try (BufferedReader reader=new BufferedReader(new FileReader(samplePath))){
                                 String kmer;
                                 while ((kmer=reader.readLine())!=null){
                                     // 对每个 kmer 进行哈希操作，确保哈希值在 group_nums 范围内
-                                    int group_idx = Math.abs(kmer.hashCode()) % group_nums;
+                                    int group_idx = (kmer.hashCode()& 0x7FFFFFFF) % group_nums;//确保不是负数
                                     int global_block_idx=cur_block_index-group_nums+1+group_idx;
                                     index.getBlock(global_block_idx).addElement(j,kmer);
                                 }

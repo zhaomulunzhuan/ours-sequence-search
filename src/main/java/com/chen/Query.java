@@ -98,7 +98,9 @@ public class Query {
             int group_nums = entry.getKey();
             List<Integer> datasetIdxs = entry.getValue();
             //得到段内组索引
-            int group_idx = Math.abs(kmer.hashCode()) % group_nums;
+//            int group_idx = Math.abs(kmer.hashCode()) % group_nums;
+            int group_idx =(kmer.hashCode()& 0x7FFFFFFF) % group_nums;
+
             List<Integer> blockList = MetaData.getBlocksByGroupNumAndGroupIdx(group_nums, group_idx);
             //k个哈希索引
             List<Long> rowIdxs = new ArrayList<>();
@@ -184,14 +186,15 @@ public class Query {
         }
 
     }
-        public static List<String> querykmerAScol(String kmer){
+    public static List<String> querykmerAScol(String kmer){
         List<String> results=new ArrayList<>();
 
         for(Map.Entry<Integer,List<Integer>> entry:MetaData.getGroupNum_to_samples().entrySet()) {
             int group_nums = entry.getKey();
             List<Integer> datasetIdxs = entry.getValue();
             //得到段内组索引
-            int group_idx = Math.abs(kmer.hashCode()) % group_nums;
+//            int group_idx = Math.abs(kmer.hashCode()) % group_nums;
+            int group_idx =(kmer.hashCode()& 0x7FFFFFFF) % group_nums;
             List<Integer> blockList = MetaData.getBlocksByGroupNumAndGroupIdx(group_nums, group_idx);
             //k个哈希索引
 //            List<Long> rowIdxs = new ArrayList<>();
@@ -289,7 +292,8 @@ public class Query {
             int group_nums = entry.getKey();
             List<Integer> datasetIdxs = entry.getValue();
             //得到段内组索引
-            int group_idx = Math.abs(kmer.hashCode()) % group_nums;
+//            int group_idx = Math.abs(kmer.hashCode()) % group_nums;
+            int group_idx =(kmer.hashCode()& 0x7FFFFFFF) % group_nums;
             List<Integer> blockList = MetaData.getBlocksByGroupNumAndGroupIdx(group_nums, group_idx);
             //k个哈希索引
             List<Long> rowIdxs = new ArrayList<>();

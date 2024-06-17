@@ -17,10 +17,10 @@ public class Block implements Serializable {
     private boolean  useRowStorage;//按行还是按列，这里的按列是指逻辑布隆过滤器存储连续，用于构建，添加，删除，按行是每个布隆过滤器的同一bit连续，用于查询
     private boolean serializeAsRow; // 指示序列化方式
 
-    private static long bitset_convert_longarray=0;
+    private static long longarray_qurey_time=0;
 
-    public static long getBitset_convert_longarray() {
-        return bitset_convert_longarray;
+    public static long getLongarray_qurey_time(){
+        return longarray_qurey_time;
     }
 
     public Block(int BlockIndex, int numsBloomFilter){
@@ -111,16 +111,14 @@ public class Block implements Serializable {
 
 
     public BitSet queryKmer_longArray_row(List<Long> rowIdxs){//按行查询 将longbitset转换为long数组
-        long start_convert=System.currentTimeMillis();
         //转换为long数组
         long[] longarray=rowStorageBlock.toLongArray();
-        long end_convert=System.currentTimeMillis();
-        bitset_convert_longarray+=(end_convert-start_convert);
+
+        long start_query_time=System.currentTimeMillis();
 
         BitSet result = new BitSet(numsBloomFilter);
         result.set(0, numsBloomFilter);//所有位设置为true
         BitSet tempbitset=new BitSet(numsBloomFilter);
-
 
         for(long index:rowIdxs){
             long start_index= (long) index *numsBloomFilter;//哈希到的这一行的一个元素的bit索引
@@ -153,6 +151,10 @@ public class Block implements Serializable {
             tempbitset.clear();
 
         }
+
+        long end_query_time=System.currentTimeMillis();
+        longarray_qurey_time=(end_query_time-start_query_time);
+
         return result;
     }
 
@@ -245,7 +247,7 @@ public class Block implements Serializable {
     }
 
     // 序列化方法
-    public void serialize() {
+    public void serialize() {//其实就是按照序列化要求统一存储方式
         if (serializeAsRow && !useRowStorage) {
             // 如果按行序列化，并且当前是按列存储，则先进行转换为按行存储
 //            System.out.println("当前BloomFilterList大小"+);
