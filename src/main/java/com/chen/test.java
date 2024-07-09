@@ -7,25 +7,33 @@ import java.util.*;
 public class test {
     public static void main(String[] args) throws IOException {
 //        初次构建
-        DataPreProcessing.dataPreprocessing();
-        Build.buildIndex();
+//        DataPreProcessing.dataPreprocessing();
+//        Build.buildIndex();
 
         //不是初次构建，从序列化文件中加载
-//        long startBuild = System.currentTimeMillis();
-//
-//        Build.buildIndexFromSER();
-//
-//        long endBuild = System.currentTimeMillis();
-//        long BuildTime = endBuild - startBuild;
-//        System.out.println("反序列化构建时间" + BuildTime + "毫秒");
+        long startBuild = System.currentTimeMillis();
+
+        Build.buildIndexFromSER();
+
+        long endBuild = System.currentTimeMillis();
+        long BuildTime = endBuild - startBuild;
+        System.out.println("反序列化构建时间" + BuildTime + "毫秒");
 
         //测试查询 bitset
+        //逐个段查询
         long startQuery = System.currentTimeMillis();
         Query.queryFile_bitset_row("D:\\SequenceSearch_2\\query.txt");
         long endQuery = System.currentTimeMillis();
         long QueryTime = endQuery - startQuery;
         System.out.println("bitset按行查询时间" + QueryTime + "毫秒");
         System.out.println("直接累加序列查询时间"+Query.getQuery_time_row_bitset()+"ms");
+        //使用多线程多个段并行查询
+        long startQuery_parallel = System.currentTimeMillis();
+        Query.queryFile_bitset_row_parallel("D:\\SequenceSearch_2\\query.txt");
+        long endQuery_parallel = System.currentTimeMillis();
+        long QueryTime_parallel = endQuery_parallel - startQuery_parallel;
+        System.out.println("bitset按行并行查询时间" + QueryTime_parallel + "毫秒");
+        System.out.println("直接累加序列查询时间"+Query.getQuery_time_row_bitset_parallel()+"ms");
 //
 //        //按行查询 long数组
 //        long startQuery2 = System.currentTimeMillis();

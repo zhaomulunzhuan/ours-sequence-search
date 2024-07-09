@@ -120,7 +120,8 @@ public class Insert {
             try (BufferedReader reader=new BufferedReader(new FileReader(kmerdataPath))){
                 String kmer;
                 while((kmer=reader.readLine())!=null){
-                    int group_idx=Math.abs(kmer.hashCode())%group_nums;
+//                    int group_idx=Math.abs(kmer.hashCode())%group_nums;
+                    int group_idx = (kmer.hashCode()& 0x7FFFFFFF) % group_nums;
                     int global_block_index=MetaData.getBlocksByGroupNumAndGroupIdx(group_nums,group_idx).get(insert_block);
                     Block insertblock=index.getBlock(global_block_index);
                     if(insertblock.getUseRowStorage()){//如果当前块是按行存储，则先转换

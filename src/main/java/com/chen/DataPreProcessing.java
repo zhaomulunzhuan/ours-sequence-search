@@ -29,6 +29,7 @@ public class DataPreProcessing {
         }catch (IOException e){
             System.out.println("读取数据集文件路径时发生错误"+ e.getMessage());
         }
+        long start=System.nanoTime();//基数估计操作起始时间
         //基数估计
         String kmerdatasetsPath=ConfigReader.getProperty("project-root-directory")+"/"+ConfigReader.getProperty("kmerdatasets_path");
         HyperLogLogEstimator.estimateKmerCardinalities(kmerdatasetsPath);
@@ -42,11 +43,15 @@ public class DataPreProcessing {
         ConfigReader.addProperty("BF-size", String.valueOf(m));
         //分段
         Utils.divideSegment(b);
+        long end=System.nanoTime();//基数估计操作起始时间
+        long time=end-start;
+        double TimeInsecondes=(double) time/1000_000_000.0;
 
         long endTime=System.nanoTime();//结束时间
         long elapsedTime=endTime-startTime;
         double elapsedTimeInsecondes=(double) elapsedTime/1000_000_000.0;
         System.out.println("数据预处理程序运行时间"+elapsedTimeInsecondes+"秒");
+        System.out.println("基数估计和分段时间"+TimeInsecondes+"秒");
 //        MetaData.outputMetadata();
 
     }
